@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-01-26 10:40:31
+" Last Change: 2015-01-26 11:15:14
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -8,7 +8,7 @@ let s:BufferStack = vim_lib#view#BufferStack#
 
 function! vim_git#run(command) " {{{
 	" workardound for MacVim, on which shell does not inherit environment variables
-  let l:response = system(((has('mac') && &shell =~ 'sh$')? 'EDITOR="" ' : '') . g:git#bin . ' ' . a:command)
+  let l:response = system(((has('mac') && &shell =~ 'sh$')? 'EDITOR="" ' : '') . g:vim_git#.bin . ' ' . a:command)
   if v:shell_error
     echohl Error | echo l:response | echohl None
     return ''
@@ -19,7 +19,7 @@ endfunction " }}}
 
 function! vim_git#exe(command) " {{{
 	" workardound for MacVim, on which shell does not inherit environment variables
-  execute '!' ((has('mac') && &shell =~ 'sh$')? 'EDITOR="" ' : '') . g:git#bin . ' ' . a:command
+  execute '!' ((has('mac') && &shell =~ 'sh$')? 'EDITOR="" ' : '') . g:vim_git#.bin . ' ' . a:command
 endfunction " }}}
 
 function! vim_git#status() " {{{
@@ -155,7 +155,7 @@ function! vim_git#branch() " {{{
     let l:buf.branch = expand('<cWORD>')
     let l:buf.currentFile = self.currentFile
     let l:buf.currentFileType = self.currentFileType
-    let l:buf.render = "git#run('diff ' . self.branch . ' --name-status')"
+    let l:buf.render = "vim_git#run('diff ' . self.branch . ' --name-status')"
     call l:buf.listen('n', '<Enter>', 'showFile')
     call l:buf.listen('n', 'd', 'diff')
     call l:buf.listen('n', 'D', 'vimdiff')
@@ -168,7 +168,7 @@ function! vim_git#branch() " {{{
       call l:buf.option('filetype', 'git-diff')
       let l:buf.branch = self.branch
       let l:buf.file = expand('<cfile>')
-      let l:buf.render = "git#run('show ' . self.branch . ':' . self.file)"
+      let l:buf.render = "vim_git#run('show ' . self.branch . ':' . self.file)"
       call self.stack.push(l:buf)
       call self.stack.active()
     endfunction " }}}
@@ -178,7 +178,7 @@ function! vim_git#branch() " {{{
       call l:buf.option('filetype', 'git-diff')
       let l:buf.branch = self.branch
       let l:buf.file = expand('<cfile>')
-      let l:buf.render = "git#run('diff ' . self.branch . ' -- ' . self.file)"
+      let l:buf.render = "vim_git#run('diff ' . self.branch . ' -- ' . self.file)"
       call self.stack.push(l:buf)
       call self.stack.active()
     endfunction " }}}
@@ -223,7 +223,7 @@ function! vim_git#branch() " {{{
     call l:buf.option('filetype', 'git-diff')
     let l:buf.commit = expand('<cWORD>')
     let l:buf.currentFile = self.currentFile
-    let l:buf.render = "git#run('diff ' . self.commit . ' -- ' . self.currentFile)"
+    let l:buf.render = "vim_git#run('diff ' . self.commit . ' -- ' . self.currentFile)"
     call self.stack.push(l:buf)
     call self.stack.active()
   endfunction " }}}
@@ -286,4 +286,11 @@ function! vim_git#tagList() " {{{
   function! l:buf.show() " {{{
     echo vim_git#run('show -s --format=%an::%H%n%s ' . expand('<cWORD>'))
   endfunction " }}}
+endfunction " }}}
+
+function! vim_git#commit() " {{{
+  let l:buf = s:Buffer.new()
+  call l:buf.gactive('t')
+  exe 'e ' . tempname()
+  autocmd BufWritePost <buffer> call vim_git#run('commit -F ' . expand('%'))
 endfunction " }}}
