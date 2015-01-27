@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-01-26 11:15:14
+" Last Change: 2015-01-27 11:56:35
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -11,7 +11,7 @@ function! vim_git#run(command) " {{{
   let l:response = system(((has('mac') && &shell =~ 'sh$')? 'EDITOR="" ' : '') . g:vim_git#.bin . ' ' . a:command)
   if v:shell_error
     echohl Error | echo l:response | echohl None
-    return ''
+    throw 'ShellException'
   else
     return l:response
   endif
@@ -122,7 +122,7 @@ function! vim_git#log() " {{{
 endfunction " }}}
 
 function! vim_git#branch() " {{{
-  let l:buf = s:Buffer.new()
+  let l:buf = s:Buffer.new('Git-branch')
   call l:buf.temp()
   call l:buf.option('filetype', 'git-branch')
   let l:buf.currentFile = expand('%')
@@ -134,6 +134,36 @@ function! vim_git#branch() " {{{
   call l:buf.listen('n', 'd', 'diff')
   call l:buf.listen('n', 'D', 'vimdiff')
   call l:buf.listen('n', 'f', 'fetch')
+  call l:buf.listen('n', 'o', 'newBranch')
+  call l:buf.listen('n', 'i', 'newBranch')
+  call l:buf.listen('n', 'a', 'newBranch')
+  call l:buf.listen('n', 'dd', 'deleteBranch')
+
+  let l:menu = s:Buffer.new('Git-branch-menu')
+  call l:menu.temp()
+  function! l:menu.render() " {{{
+    return join(['--all - показать все ветки',
+               \ '--verbose - показать подробную информацию о ветках',
+               \ '--merged - показать слитые с текущей веткой',
+               \ '--no-merged - показать не слитые с текущей веткой'], "\n")
+  endfunction " }}}
+  let l:buf.menu = l:menu
+  let l:menu.buf = l:buf
+  call l:menu.listen('n', '<Enter>', 'modif')
+  function! l:menu.modif() " {{{
+    let self.buf.render = "vim_git#run('branch " . expand('<cWORD>') . "')"
+    call self.buf.select()
+    call self.buf.active()
+    call self.select()
+  endfunction " }}}
+  call l:buf.listen('n', 'v', 'toogleMenu')
+  function! l:buf.toogleMenu() " {{{
+    if bufloaded(self.menu.getNum()) == 0
+      call self.menu.vactive('r', '30%')
+    else
+      call self.menu.unload()
+    endif
+  endfunction " }}}
 
   let l:bufStack = s:BufferStack.new()
   call l:bufStack.push(l:buf)
@@ -146,7 +176,13 @@ function! vim_git#branch() " {{{
     call setpos('.', l:pos)
   endfunction " }}}
   function! l:buf.merge() " {{{
-    call vim_git#run('merge ' . expand('<cWORD>'))
+    try
+      call vim_git#run('merge ' . expand('<cWORD>'))
+      call inputsave()
+      echohl MoreMsg | call input('Merge complete.') | echohl None
+      call inputrestore()
+    catch /ShellException:.*/
+    endtry
   endfunction " }}}
   function! l:buf.status() " {{{
     let l:buf = s:Buffer.new()
@@ -266,6 +302,23 @@ function! vim_git#branch() " {{{
     let l:repository = strpart(l:remoteBranch, 0, l:p)
     let l:branch = strpart(l:remoteBranch, l:p + 1)
     call vim_git#run('fetch ' . l:repository . ' ' . l:branch . ':' . l:branch)
+  endfunction " }}}
+  function! l:buf.newBranch() " {{{
+    call inputsave()
+    let l:branchName = input('Enter branch name: ')
+    call inputrestore()
+    if l:branchName != ''
+      let l:pos = getpos('.')
+      call vim_git#run('branch ' . l:branchName)
+      call self.active()
+      call setpos('.', l:pos)
+    endif
+  endfunction " }}}
+  function! l:buf.deleteBranch() " {{{
+    let l:pos = getpos('.')
+    call vim_git#run('branch -D ' . expand('<cWORD>'))
+    call self.active()
+    call setpos('.', l:pos)
   endfunction " }}}
 endfunction " }}}
 
