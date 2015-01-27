@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-01-27 11:56:35
+" Last Change: 2015-01-27 12:20:28
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -23,7 +23,7 @@ function! vim_git#exe(command) " {{{
 endfunction " }}}
 
 function! vim_git#status() " {{{
-  let l:buf = s:Buffer.new()
+  let l:buf = s:Buffer.new('Git-status')
   call l:buf.temp()
   call l:buf.option('filetype', 'git-status')
   let l:buf.render = "vim_git#run('status')"
@@ -53,7 +53,7 @@ function! vim_git#status() " {{{
 endfunction " }}}
 
 function! vim_git#log() " {{{
-  let l:buf = s:Buffer.new()
+  let l:buf = s:Buffer.new('Git-log')
   call l:buf.temp()
   call l:buf.option('filetype', 'git-log')
   let l:buf.render = "vim_git#run('log')"
@@ -323,7 +323,7 @@ function! vim_git#branch() " {{{
 endfunction " }}}
 
 function! vim_git#tagList() " {{{
-  let l:buf = s:Buffer.new()
+  let l:buf = s:Buffer.new('Git-tag')
   call l:buf.temp()
   call l:buf.option('filetype', 'git-tag')
   let l:buf.render = "vim_git#run('tag')"
