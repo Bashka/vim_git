@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-02-04 11:19:40
+" Last Change: 2015-02-04 15:59:36
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -15,7 +15,7 @@ function! vim_git#exe(command) " {{{
   call s:Sys.exe(g:vim_git#.bin . ' ' . a:command)
 endfunction " }}}
 
-function! vim_git#status() " {{{
+function! vim_git#status(event) " {{{
   let l:buf = s:Buffer.new('Git-status')
   call l:buf.temp()
   call l:buf.option('filetype', 'git-status')
@@ -48,7 +48,7 @@ function! vim_git#status() " {{{
   endfunction " }}}
 endfunction " }}}
 
-function! vim_git#log() " {{{
+function! vim_git#log(event) " {{{
   let l:buf = s:Buffer.new('Git-log')
   call l:buf.temp()
   call l:buf.option('filetype', 'git-log')
@@ -117,7 +117,7 @@ function! vim_git#log() " {{{
   endfunction " }}}
 endfunction " }}}
 
-function! vim_git#branch() " {{{
+function! vim_git#branch(event) " {{{
   let l:buf = s:Buffer.new('Git-branch')
   call l:buf.temp()
   call l:buf.option('filetype', 'git-branch')
@@ -318,7 +318,7 @@ function! vim_git#branch() " {{{
   endfunction " }}}
 endfunction " }}}
 
-function! vim_git#tagList() " {{{
+function! vim_git#tagList(event) " {{{
   let l:buf = s:Buffer.new('Git-tag')
   call l:buf.temp()
   call l:buf.option('filetype', 'git-tag')
@@ -340,9 +340,30 @@ function! vim_git#tagList() " {{{
   endfunction " }}}
 endfunction " }}}
 
-function! vim_git#commit() " {{{
+function! vim_git#commit(event) " {{{
   let l:buf = s:Buffer.new()
   call l:buf.gactive('t')
   exe 'e ' . tempname()
   autocmd BufWritePost <buffer> call vim_git#run('commit -F ' . expand('%'))
+endfunction " }}}
+
+function! vim_git#commitAll(event) " {{{
+  call vim_git#addAll(a:event)
+  call vim_git#commit(a:event)
+endfunction " }}}
+
+function! vim_git#push(event) " {{{
+  call vim_git#exe('push')
+endfunction " }}}
+
+function! vim_git#pull(event) " {{{
+  call vim_git#run('pull')
+endfunction " }}}
+
+function! vim_git#addCurrent(event) " {{{
+  call vim_git#run('add ' . expand('%'))
+endfunction " }}}
+
+function! vim_git#addAll(event) " {{{
+  call vim_git#run('add .')
 endfunction " }}}
