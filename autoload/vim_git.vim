@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-02-04 15:59:36
+" Last Change: 2015-02-04 16:35:10
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -20,11 +20,11 @@ function! vim_git#status(event) " {{{
   call l:buf.temp()
   call l:buf.option('filetype', 'git-status')
   let l:buf.render = "vim_git#run('status')"
-  call l:buf.listen('n', 'q', 'quit')
-  call l:buf.listen('n', 'a', 'addFile')
-  call l:buf.listen('n', 'd', 'resetFile')
-  call l:buf.listen('n', 'r', 'checkoutFile')
-  call l:buf.listen('n', 'R', 'checkoutAllFile')
+  call l:buf.map('n', 'q', 'quit')
+  call l:buf.map('n', 'a', 'addFile')
+  call l:buf.map('n', 'd', 'resetFile')
+  call l:buf.map('n', 'r', 'checkoutFile')
+  call l:buf.map('n', 'R', 'checkoutAllFile')
   call l:buf.gactive('t')
 
   function! l:buf.quit(...) " {{{
@@ -55,10 +55,10 @@ function! vim_git#log(event) " {{{
   let l:buf.render = "vim_git#run('log')"
   let l:buf.currentFile = expand('%')
   let l:buf.currentFileType = &l:filetype
-  call l:buf.listen('n', '<Enter>', 'checkoutCommit')
-  call l:buf.listen('n', 'd', 'diffFile')
-  call l:buf.listen('n', 'D', 'vimdiffFile')
-  call l:buf.listen('n', 'f', 'diffList')
+  call l:buf.map('n', '<Enter>', 'checkoutCommit')
+  call l:buf.map('n', 'd', 'diffFile')
+  call l:buf.map('n', 'D', 'vimdiffFile')
+  call l:buf.map('n', 'f', 'diffList')
 
   let l:bufStack = s:BufferStack.new()
   call l:bufStack.push(l:buf)
@@ -86,7 +86,7 @@ function! vim_git#log(event) " {{{
     call l:bufA.option('filetype', self.currentFileType)
     call self.stack.push(l:bufA)
     call l:bufA.ignore('n', 'q')
-    call l:bufA.listen('n', 'q', 'quit')
+    call l:bufA.map('n', 'q', 'quit')
     function! l:bufA.quit(...) " {{{
       call self.bufB.delete()
       call self.stack.delete()
@@ -101,7 +101,7 @@ function! vim_git#log(event) " {{{
     call l:bufB.temp()
     call l:bufB.option('filetype', self.currentFileType)
     let l:bufB.bufA = l:bufA
-    call l:bufB.listen('n', 'q', 'quit')
+    call l:bufB.map('n', 'q', 'quit')
     function! l:bufB.quit(...) " {{{
       call self.bufA.quit()
     endfunction " }}}
@@ -124,16 +124,16 @@ function! vim_git#branch(event) " {{{
   let l:buf.currentFile = expand('%')
   let l:buf.currentFileType = &l:filetype
   let l:buf.render = "vim_git#run('branch -a')"
-  call l:buf.listen('n', '<Enter>', 'checkoutBranch')
-  call l:buf.listen('n', 'm', 'merge')
-  call l:buf.listen('n', 's', 'status')
-  call l:buf.listen('n', 'd', 'diff')
-  call l:buf.listen('n', 'D', 'vimdiff')
-  call l:buf.listen('n', 'f', 'fetch')
-  call l:buf.listen('n', 'o', 'newBranch')
-  call l:buf.listen('n', 'i', 'newBranch')
-  call l:buf.listen('n', 'a', 'newBranch')
-  call l:buf.listen('n', 'dd', 'deleteBranch')
+  call l:buf.map('n', '<Enter>', 'checkoutBranch')
+  call l:buf.map('n', 'm', 'merge')
+  call l:buf.map('n', 's', 'status')
+  call l:buf.map('n', 'd', 'diff')
+  call l:buf.map('n', 'D', 'vimdiff')
+  call l:buf.map('n', 'f', 'fetch')
+  call l:buf.map('n', 'o', 'newBranch')
+  call l:buf.map('n', 'i', 'newBranch')
+  call l:buf.map('n', 'a', 'newBranch')
+  call l:buf.map('n', 'dd', 'deleteBranch')
 
   let l:menu = s:Buffer.new('Git-branch-menu')
   call l:menu.temp()
@@ -145,14 +145,14 @@ function! vim_git#branch(event) " {{{
   endfunction " }}}
   let l:buf.menu = l:menu
   let l:menu.buf = l:buf
-  call l:menu.listen('n', '<Enter>', 'modif')
+  call l:menu.map('n', '<Enter>', 'modif')
   function! l:menu.modif(...) " {{{
     let self.buf.render = "vim_git#run('branch " . expand('<cWORD>') . "')"
     call self.buf.select()
     call self.buf.active()
     call self.select()
   endfunction " }}}
-  call l:buf.listen('n', 'v', 'toogleMenu')
+  call l:buf.map('n', 'v', 'toogleMenu')
   function! l:buf.toogleMenu(...) " {{{
     if bufloaded(self.menu.getNum()) == 0
       call self.menu.vactive('r', '30%')
@@ -186,9 +186,9 @@ function! vim_git#branch(event) " {{{
     let l:buf.currentFile = self.currentFile
     let l:buf.currentFileType = self.currentFileType
     let l:buf.render = "vim_git#run('diff ' . self.branch . ' --name-status')"
-    call l:buf.listen('n', '<Enter>', 'showFile')
-    call l:buf.listen('n', 'd', 'diff')
-    call l:buf.listen('n', 'D', 'vimdiff')
+    call l:buf.map('n', '<Enter>', 'showFile')
+    call l:buf.map('n', 'd', 'diff')
+    call l:buf.map('n', 'D', 'vimdiff')
     call self.stack.push(l:buf)
     call self.stack.active()
 
@@ -221,7 +221,7 @@ function! vim_git#branch(event) " {{{
       call l:bufA.option('filetype', self.currentFileType)
       call self.stack.push(l:bufA)
       call l:bufA.ignore('n', 'q')
-      call l:bufA.listen('n', 'q', 'quit')
+      call l:bufA.map('n', 'q', 'quit')
       function! l:bufA.quit(...) " {{{
         call self.bufB.delete()
         call self.stack.delete()
@@ -236,7 +236,7 @@ function! vim_git#branch(event) " {{{
       call l:bufB.temp()
       call l:bufB.option('filetype', self.currentFileType)
       let l:bufB.bufA = l:bufA
-      call l:bufB.listen('n', 'q', 'quit')
+      call l:bufB.map('n', 'q', 'quit')
       function! l:bufB.quit(...) " {{{
         call self.bufA.quit()
       endfunction " }}}
@@ -266,7 +266,7 @@ function! vim_git#branch(event) " {{{
     call l:bufA.option('filetype', self.currentFileType)
     call self.stack.push(l:bufA)
     call l:bufA.ignore('n', 'q')
-    call l:bufA.listen('n', 'q', 'quit')
+    call l:bufA.map('n', 'q', 'quit')
     function! l:bufA.quit(...) " {{{
       call self.bufB.delete()
       call self.stack.delete()
@@ -281,7 +281,7 @@ function! vim_git#branch(event) " {{{
     call l:bufB.temp()
     call l:bufB.option('filetype', self.currentFileType)
     let l:bufB.bufA = l:bufA
-    call l:bufB.listen('n', 'q', 'quit')
+    call l:bufB.map('n', 'q', 'quit')
     function! l:bufB.quit(...) " {{{
       call self.bufA.quit()
     endfunction " }}}
@@ -323,9 +323,9 @@ function! vim_git#tagList(event) " {{{
   call l:buf.temp()
   call l:buf.option('filetype', 'git-tag')
   let l:buf.render = "vim_git#run('tag')"
-  call l:buf.listen('n', '<Enter>', 'checkoutTag')
-  call l:buf.listen('n', 's', 'show')
-  call l:buf.listen('n', 'q', 'quit')
+  call l:buf.map('n', '<Enter>', 'checkoutTag')
+  call l:buf.map('n', 's', 'show')
+  call l:buf.map('n', 'q', 'quit')
   call l:buf.gactive('t')
 
   function! l:buf.quit(...) " {{{
