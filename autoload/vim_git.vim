@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-02-02 23:52:00
+" Last Change: 2015-02-04 11:19:40
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -85,6 +85,7 @@ function! vim_git#log() " {{{
     call l:bufA.temp()
     call l:bufA.option('filetype', self.currentFileType)
     call self.stack.push(l:bufA)
+    call l:bufA.ignore('n', 'q')
     call l:bufA.listen('n', 'q', 'quit')
     function! l:bufA.quit(...) " {{{
       call self.bufB.delete()
@@ -107,7 +108,7 @@ function! vim_git#log() " {{{
     call l:bufB.vactive('l')
     exe 'r ' . self.currentFile
     0d
-    "diffthis
+    diffthis
 
     let l:bufA.bufB = l:bufB
   endfunction " }}}
@@ -219,6 +220,7 @@ function! vim_git#branch() " {{{
       call l:bufA.temp()
       call l:bufA.option('filetype', self.currentFileType)
       call self.stack.push(l:bufA)
+      call l:bufA.ignore('n', 'q')
       call l:bufA.listen('n', 'q', 'quit')
       function! l:bufA.quit(...) " {{{
         call self.bufB.delete()
@@ -263,6 +265,7 @@ function! vim_git#branch() " {{{
     call l:bufA.temp()
     call l:bufA.option('filetype', self.currentFileType)
     call self.stack.push(l:bufA)
+    call l:bufA.ignore('n', 'q')
     call l:bufA.listen('n', 'q', 'quit')
     function! l:bufA.quit(...) " {{{
       call self.bufB.delete()
