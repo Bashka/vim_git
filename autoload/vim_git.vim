@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-02-04 16:35:10
+" Last Change: 2015-02-06 23:56:34
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -15,21 +15,24 @@ function! vim_git#exe(command) " {{{
   call s:Sys.exe(g:vim_git#.bin . ' ' . a:command)
 endfunction " }}}
 
-function! vim_git#status(event) " {{{
+function! vim_git#status() " {{{
   let l:buf = s:Buffer.new('Git-status')
+  " Закрыть окно, если оно уже открыто. {{{
+  if l:buf.getWinNum() != -1
+    call l:buf.delete()
+    return 0
+  endif
+  " }}}
   call l:buf.temp()
   call l:buf.option('filetype', 'git-status')
   let l:buf.render = "vim_git#run('status')"
-  call l:buf.map('n', 'q', 'quit')
+  call l:buf.map('n', '<C-y>', 'delete')
   call l:buf.map('n', 'a', 'addFile')
   call l:buf.map('n', 'd', 'resetFile')
   call l:buf.map('n', 'r', 'checkoutFile')
   call l:buf.map('n', 'R', 'checkoutAllFile')
   call l:buf.gactive('t')
 
-  function! l:buf.quit(...) " {{{
-    call self.delete()
-  endfunction " }}}
   function! l:buf.addFile(...) " {{{
     call vim_git#run('add ' . expand('<cfile>'))
     call self.active()
@@ -48,11 +51,19 @@ function! vim_git#status(event) " {{{
   endfunction " }}}
 endfunction " }}}
 
-function! vim_git#log(event) " {{{
+function! vim_git#log() " {{{
   let l:buf = s:Buffer.new('Git-log')
+  " Закрыть окно, если оно уже открыто. {{{
+  if l:buf.getWinNum() != -1
+    call l:buf.quit()
+    return 0
+  endif
+  " }}}
   call l:buf.temp()
   call l:buf.option('filetype', 'git-log')
-  let l:buf.render = "vim_git#run('log')"
+  function! l:buf.render() " {{{
+    return vim_git#run('log --graph --pretty="format:%h [%ar by %an] - %s "')
+  endfunction " }}}
   let l:buf.currentFile = expand('%')
   let l:buf.currentFileType = &l:filetype
   call l:buf.map('n', '<Enter>', 'checkoutCommit')
@@ -64,11 +75,11 @@ function! vim_git#log(event) " {{{
   call l:bufStack.push(l:buf)
   call l:bufStack.gactive('t')
 
-  function! l:buf.checkoutCommit(...) " {{{
+  function! l:buf.checkoutCommit() " {{{
     call vim_git#run('checkout ' . expand('<cword>'))
     call self.active()
   endfunction " }}}
-  function! l:buf.diffFile(...) " {{{
+  function! l:buf.diffFile() " {{{
     let l:buf = s:Buffer.new()
     call l:buf.temp()
     call l:buf.option('filetype', 'git-diff')
@@ -78,16 +89,16 @@ function! vim_git#log(event) " {{{
     call self.stack.push(l:buf)
     call self.stack.active()
   endfunction " }}}
-  function! l:buf.vimdiffFile(...) " {{{
+  function! l:buf.vimdiffFile() " {{{
     let git_output = vim_git#run('cat-file -p ' . expand('<cword>') . ':' . self.currentFile)
     " bufA - diff file
     let l:bufA = s:Buffer.new()
     call l:bufA.temp()
     call l:bufA.option('filetype', self.currentFileType)
     call self.stack.push(l:bufA)
-    call l:bufA.ignore('n', 'q')
-    call l:bufA.map('n', 'q', 'quit')
-    function! l:bufA.quit(...) " {{{
+    call l:bufA.ignore('n', '<C-y>')
+    call l:bufA.map('n', '<C-y>', 'quit')
+    function! l:bufA.quit() " {{{
       call self.bufB.delete()
       call self.stack.delete()
     endfunction " }}}
@@ -101,8 +112,8 @@ function! vim_git#log(event) " {{{
     call l:bufB.temp()
     call l:bufB.option('filetype', self.currentFileType)
     let l:bufB.bufA = l:bufA
-    call l:bufB.map('n', 'q', 'quit')
-    function! l:bufB.quit(...) " {{{
+    call l:bufB.map('n', '<C-y>', 'quit')
+    function! l:bufB.quit() " {{{
       call self.bufA.quit()
     endfunction " }}}
     call l:bufB.vactive('l')
@@ -117,8 +128,14 @@ function! vim_git#log(event) " {{{
   endfunction " }}}
 endfunction " }}}
 
-function! vim_git#branch(event) " {{{
+function! vim_git#branch() " {{{
   let l:buf = s:Buffer.new('Git-branch')
+  " Закрыть окно, если оно уже открыто. {{{
+  if l:buf.getWinNum() != -1
+    call l:buf.quit()
+    return 0
+  endif
+  " }}}
   call l:buf.temp()
   call l:buf.option('filetype', 'git-branch')
   let l:buf.currentFile = expand('%')
@@ -135,35 +152,9 @@ function! vim_git#branch(event) " {{{
   call l:buf.map('n', 'a', 'newBranch')
   call l:buf.map('n', 'dd', 'deleteBranch')
 
-  let l:menu = s:Buffer.new('Git-branch-menu')
-  call l:menu.temp()
-  function! l:menu.render() " {{{
-    return join(['--all - показать все ветки',
-               \ '--verbose - показать подробную информацию о ветках',
-               \ '--merged - показать слитые с текущей веткой',
-               \ '--no-merged - показать не слитые с текущей веткой'], "\n")
-  endfunction " }}}
-  let l:buf.menu = l:menu
-  let l:menu.buf = l:buf
-  call l:menu.map('n', '<Enter>', 'modif')
-  function! l:menu.modif(...) " {{{
-    let self.buf.render = "vim_git#run('branch " . expand('<cWORD>') . "')"
-    call self.buf.select()
-    call self.buf.active()
-    call self.select()
-  endfunction " }}}
-  call l:buf.map('n', 'v', 'toogleMenu')
-  function! l:buf.toogleMenu(...) " {{{
-    if bufloaded(self.menu.getNum()) == 0
-      call self.menu.vactive('r', '30%')
-    else
-      call self.menu.unload()
-    endif
-  endfunction " }}}
-
   let l:bufStack = s:BufferStack.new()
   call l:bufStack.push(l:buf)
-  call l:bufStack.gactive('t')
+  call l:bufStack.vactive('R')
 
   function! l:buf.checkoutBranch(...) " {{{
     let l:pos = getpos('.')
@@ -192,7 +183,7 @@ function! vim_git#branch(event) " {{{
     call self.stack.push(l:buf)
     call self.stack.active()
 
-    function! l:buf.showFile(...) " {{{
+    function! l:buf.showFile() " {{{
       let l:buf = s:Buffer.new()
       call l:buf.temp()
       call l:buf.option('filetype', 'git-diff')
@@ -202,7 +193,7 @@ function! vim_git#branch(event) " {{{
       call self.stack.push(l:buf)
       call self.stack.active()
     endfunction " }}}
-    function! l:buf.diff(...) " {{{
+    function! l:buf.diff() " {{{
       let l:buf = s:Buffer.new()
       call l:buf.temp()
       call l:buf.option('filetype', 'git-diff')
@@ -212,7 +203,7 @@ function! vim_git#branch(event) " {{{
       call self.stack.push(l:buf)
       call self.stack.active()
     endfunction " }}}
-    function! l:buf.vimdiff(...) " {{{
+    function! l:buf.vimdiff() " {{{
       let l:file = expand('<cfile>')
       let git_output = vim_git#run('show ' . self.branch . ':' . l:file)
       " bufA - diff file
@@ -220,9 +211,9 @@ function! vim_git#branch(event) " {{{
       call l:bufA.temp()
       call l:bufA.option('filetype', self.currentFileType)
       call self.stack.push(l:bufA)
-      call l:bufA.ignore('n', 'q')
-      call l:bufA.map('n', 'q', 'quit')
-      function! l:bufA.quit(...) " {{{
+      call l:bufA.ignore('n', '<C-y>')
+      call l:bufA.map('n', '<C-y>', 'quit')
+      function! l:bufA.quit() " {{{
         call self.bufB.delete()
         call self.stack.delete()
       endfunction " }}}
@@ -236,8 +227,8 @@ function! vim_git#branch(event) " {{{
       call l:bufB.temp()
       call l:bufB.option('filetype', self.currentFileType)
       let l:bufB.bufA = l:bufA
-      call l:bufB.map('n', 'q', 'quit')
-      function! l:bufB.quit(...) " {{{
+      call l:bufB.map('n', '<C-y>', 'quit')
+      function! l:bufB.quit() " {{{
         call self.bufA.quit()
       endfunction " }}}
       call l:bufB.vactive('l')
@@ -265,9 +256,9 @@ function! vim_git#branch(event) " {{{
     call l:bufA.temp()
     call l:bufA.option('filetype', self.currentFileType)
     call self.stack.push(l:bufA)
-    call l:bufA.ignore('n', 'q')
-    call l:bufA.map('n', 'q', 'quit')
-    function! l:bufA.quit(...) " {{{
+    call l:bufA.ignore('n', '<C-y>')
+    call l:bufA.map('n', '<C-y>', 'quit')
+    function! l:bufA.quit() " {{{
       call self.bufB.delete()
       call self.stack.delete()
     endfunction " }}}
@@ -281,8 +272,8 @@ function! vim_git#branch(event) " {{{
     call l:bufB.temp()
     call l:bufB.option('filetype', self.currentFileType)
     let l:bufB.bufA = l:bufA
-    call l:bufB.map('n', 'q', 'quit')
-    function! l:bufB.quit(...) " {{{
+    call l:bufB.map('n', '<C-y>', 'quit')
+    function! l:bufB.quit() " {{{
       call self.bufA.quit()
     endfunction " }}}
     call l:bufB.vactive('l')
@@ -318,19 +309,22 @@ function! vim_git#branch(event) " {{{
   endfunction " }}}
 endfunction " }}}
 
-function! vim_git#tagList(event) " {{{
+function! vim_git#tagList() " {{{
   let l:buf = s:Buffer.new('Git-tag')
+  " Закрыть окно, если оно уже открыто. {{{
+  if l:buf.getWinNum() != -1
+    call l:buf.delete()
+    return 0
+  endif
+  " }}}
   call l:buf.temp()
   call l:buf.option('filetype', 'git-tag')
   let l:buf.render = "vim_git#run('tag')"
   call l:buf.map('n', '<Enter>', 'checkoutTag')
   call l:buf.map('n', 's', 'show')
-  call l:buf.map('n', 'q', 'quit')
-  call l:buf.gactive('t')
+  call l:buf.map('n', '<C-y>', 'delete')
+  call l:buf.vactive('R')
 
-  function! l:buf.quit(...) " {{{
-    call self.delete()
-  endfunction " }}}
   function! l:buf.checkoutTag(...) " {{{
     call vim_git#run('checkout ' . expand('<cWORD>'))
     call self.delete()
@@ -340,30 +334,30 @@ function! vim_git#tagList(event) " {{{
   endfunction " }}}
 endfunction " }}}
 
-function! vim_git#commit(event) " {{{
+function! vim_git#commit() " {{{
   let l:buf = s:Buffer.new()
   call l:buf.gactive('t')
   exe 'e ' . tempname()
   autocmd BufWritePost <buffer> call vim_git#run('commit -F ' . expand('%'))
 endfunction " }}}
 
-function! vim_git#commitAll(event) " {{{
-  call vim_git#addAll(a:event)
-  call vim_git#commit(a:event)
+function! vim_git#commitAll() " {{{
+  call vim_git#addAll()
+  call vim_git#commit()
 endfunction " }}}
 
-function! vim_git#push(event) " {{{
+function! vim_git#push() " {{{
   call vim_git#exe('push')
 endfunction " }}}
 
-function! vim_git#pull(event) " {{{
+function! vim_git#pull() " {{{
   call vim_git#run('pull')
 endfunction " }}}
 
-function! vim_git#addCurrent(event) " {{{
+function! vim_git#addCurrent() " {{{
   call vim_git#run('add ' . expand('%'))
 endfunction " }}}
 
-function! vim_git#addAll(event) " {{{
+function! vim_git#addAll() " {{{
   call vim_git#run('add .')
 endfunction " }}}
