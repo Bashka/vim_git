@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-02-06 23:56:34
+" Last Change: 2015-02-07 11:08:44
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -334,6 +334,10 @@ function! vim_git#tagList() " {{{
   endfunction " }}}
 endfunction " }}}
 
+function! vim_git#addAll() " {{{
+  call vim_git#run('add -u .')
+endfunction " }}}
+
 function! vim_git#commit() " {{{
   let l:buf = s:Buffer.new()
   call l:buf.gactive('t')
@@ -356,8 +360,4 @@ endfunction " }}}
 
 function! vim_git#addCurrent() " {{{
   call vim_git#run('add ' . expand('%'))
-endfunction " }}}
-
-function! vim_git#addAll() " {{{
-  call vim_git#run('add .')
 endfunction " }}}
