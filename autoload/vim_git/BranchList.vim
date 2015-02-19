@@ -1,5 +1,5 @@
 " Date Create: 2015-02-10 22:34:25
-" Last Change: 2015-02-19 13:27:23
+" Last Change: 2015-02-19 14:50:03
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -83,7 +83,11 @@ endfunction " }}}
 " Сливает заданную ветку с текущей.
 "" }}}
 function! s:screen.merge() " {{{
-    call s:System.print(vim_git#merge(expand('<cWORD>')))
+  try
+    call vim_git#merge(expand('<cWORD>'))
+    call s:System.print('Merge complite', 'ModeMsg')
+  catch /^ShellException.*/
+  endtry
 endfunction " }}}
 "" {{{
 " Показывает отличия между текущей и заданной ветками.

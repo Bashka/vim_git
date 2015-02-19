@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-02-19 14:48:03
+" Last Change: 2015-02-19 14:48:58
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -391,7 +391,7 @@ endfunction " }}}
 " @throws ShellException Выбрасывается в случае ошибки при выполнении команды.
 "" }}}
 function! vim_git#merge(branch) " {{{
-  call vim_git#run('merge -v ' . a:branch)
+  call vim_git#run('merge ' . a:branch)
 endfunction " }}}
 
 "" {{{
