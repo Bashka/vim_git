@@ -1,5 +1,5 @@
 " Date Create: 2015-02-09 23:32:54
-" Last Change: 2015-02-19 13:29:47
+" Last Change: 2015-02-19 14:41:55
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -86,7 +86,7 @@ function! s:screen.diff() " {{{
   call l:buf.option('filetype', 'git-diff')
   let l:buf.render = "vim_git#run('diff HEAD -- " . expand('<cfile>') . "')"
   call self.stack.push(l:buf)
-  call self.active()
+  call self.stack.active()
 endfunction " }}}
 "" {{{
 " Отображает изменения, внесенные в файл с помощью редактора Vim.
@@ -131,6 +131,7 @@ let s:screen.help = ['" Manual "',
                    \ '',
                    \ '" a - add file in index',
                    \ '" dd - delete file from index',
+                   \ '" da - delete all files from index',
                    \ '" u - reset file',
                    \ '" U - reset all files',
                    \ '" d - show changes in the file',

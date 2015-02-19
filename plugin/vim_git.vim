@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 16:02:43
-" Last Change: 2015-02-19 13:52:17
+" Last Change: 2015-02-19 14:04:38
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -22,22 +22,73 @@ let s:p.logSize = 20
 let s:p.logType = 'graph'
 " }}}
 " Меню. {{{
+"" {{{
+" Отобразить статус репозитория.
+"" }}}
 call s:p.menu('Status', 'status', '1')
+"" {{{
+" Добавить текущий файл в индекс.
+"" }}}
 call s:p.menu('Index.Add', 'addCurrent', '2.1')
+"" {{{
+" Добавить все измененные файлы в индекс.
+"" }}}
 call s:p.menu('Index.Add_all', 'addAll', '2.2')
+"" {{{
+" Удалить все файлы из индекса.
+"" }}}
 call s:p.menu('Index.Reset', 'resetIndex', '2.3')
+"" {{{
+" Удалить текущий файл из индекса.
+"" }}}
 call s:p.menu('Index.Reset_file', 'resetCurrentFile', '2.4')
+"" {{{
+" Отменить все изменения.
+"" }}}
 call s:p.menu('Index.Undo', 'undoChanges', '2.5')
+"" {{{
+" Отобразить историю комитов.
+"" }}}
 call s:p.menu('Log', 'log', '3')
+"" {{{
+" Вернуться к предыдущему комиту.
+"" }}}
 call s:p.menu('Commit.Checkout_head', 'checkoutHead', '4.1')
+"" {{{
+" Создать комит.
+"" }}}
 call s:p.menu('Commit.Commit', 'commit', '4.2')
+"" {{{
+" Добавить все инзмененные файлы в индекс и создать комит.
+"" }}}
 call s:p.menu('Commit.Commit_all', 'commitAll', '4.3')
+"" {{{
+" Создать замещающий комит.
+"" }}}
 call s:p.menu('Commit.Amend_commit', 'amendCommit', '4.4')
+"" {{{
+" Добавить все инзмененные файлы в индекс и создать замещающий комит.
+"" }}}
 call s:p.menu('Commit.Amend_commit_all', 'amendCommitAll', '4.5')
+"" {{{
+" Отобразить список веток.
+"" }}}
 call s:p.menu('Branch.List', 'branchList', '5')
+"" {{{
+" Отобразить список псевдонимов серверов.
+"" }}}
 call s:p.menu('Remote.List', 'remoteList', '6.1')
+"" {{{
+" Выгрузить текущую ветку на сервер.
+"" }}}
 call s:p.menu('Remote.Push', 'pushCurrent', '6.2')
+"" {{{
+" Загрузить изменения с сервера в текущую ветку.
+"" }}}
 call s:p.menu('Remote.Pull', 'pullCurrent', '6.3')
+"" {{{
+" Отобразить список меток.
+"" }}}
 call s:p.menu('Tag.List', 'tagList', '7')
 " }}}
 
