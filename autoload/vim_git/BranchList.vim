@@ -1,5 +1,5 @@
 " Date Create: 2015-02-10 22:34:25
-" Last Change: 2015-02-19 14:50:03
+" Last Change: 2015-02-19 14:51:31
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -85,7 +85,7 @@ endfunction " }}}
 function! s:screen.merge() " {{{
   try
     call vim_git#merge(expand('<cWORD>'))
-    call s:System.print('Merge complite', 'ModeMsg')
+    call s:System.print('Merge complite', 'MoreMsg')
   catch /^ShellException.*/
   endtry
 endfunction " }}}
