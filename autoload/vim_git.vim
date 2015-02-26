@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-02-19 14:48:58
+" Last Change: 2015-02-26 14:29:55
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -24,6 +24,16 @@ endfunction " }}}
 function! vim_git#exe(command) " {{{
   call s:Sys.exe(g:vim_git#.bin . ' ' . a:command)
 endfunction " }}}
+
+" init {{{
+"" {{{
+" Метод инициализирует новый репозиторий.
+" @throws ShellException Выбрасывается в случае ошибки при выполнении команды.
+"" }}}
+function! vim_git#init() " {{{
+  call vim_git#exe('init')
+endfunction " }}}
+" }}}
 
 " add {{{
 "" {{{
@@ -515,3 +525,7 @@ function! vim_git#remoteList() " {{{
   endif
 endfunction " }}}
 " }}}
+
+function! vim_git#help() " {{{
+  h vim_git
+endfunction " }}}

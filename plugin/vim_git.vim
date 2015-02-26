@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 16:02:43
-" Last Change: 2015-02-19 14:04:38
+" Last Change: 2015-02-26 14:30:28
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -90,6 +90,14 @@ call s:p.menu('Remote.Pull', 'pullCurrent', '6.3')
 " Отобразить список меток.
 "" }}}
 call s:p.menu('Tag.List', 'tagList', '7')
+"" {{{
+" Инициализировать новый репозиторий.
+"" }}}
+call s:p.menu('Init', 'init', '8')
+"" {{{
+" Отобразить документацию плагина.
+"" }}}
+call s:p.menu('Help', 'help', '9')
 " }}}
 
 call s:p.reg()
