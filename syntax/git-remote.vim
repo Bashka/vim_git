@@ -1,6 +1,5 @@
 runtime syntax/diff.vim
-setlocal filetype=
+set syntax=git-base
 
-syntax match Comment /^".*/
 syntax match gitStatusComment   +^#.*+ contains=ALL
 highlight link gitStatusComment     Comment

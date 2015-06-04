@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 16:02:43
-" Last Change: 2015-02-26 14:30:28
+" Last Change: 2015-06-04 23:18:24
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -20,6 +20,18 @@ let s:p.logSize = 20
 " @var string Тип вывода истории комитов. Возможно одно из следующих занчение: graph - граф; classic - обычный лог.
 "" }}}
 let s:p.logType = 'graph'
+"" {{{
+" @var string Фильтр лога по автору.
+"" }}}
+let s:p.logAuthor = ''
+"" {{{
+" @var string Фильтр лога по дате "до".
+"" }}}
+let s:p.logAfter = ''
+"" {{{
+" @var string Фильтр лога по дате "после".
+"" }}}
+let s:p.logBefore = ''
 " }}}
 " Меню. {{{
 "" {{{

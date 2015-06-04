@@ -1,5 +1,5 @@
 " Date Create: 2015-02-11 09:32:04
-" Last Change: 2015-02-18 10:16:55
+" Last Change: 2015-03-08 14:39:50
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -10,7 +10,7 @@ function! vim_git#BranchInfo#new(branch) " {{{
   let s:screen = s:Buffer.new('#Git-branch-diff#')
   call s:screen.temp()
   call s:screen.option('filetype', 'git-commit')
-  let s:screen.currentBranch = vim_git#run('rev-parse --abbrev-ref HEAD')[0 : -2]
+  let s:screen.currentBranch = vim_git#currentBranch()
   let s:screen.diffBranch = a:branch
   function! s:screen.render() " {{{
     return '" Branch (Press ? for help) "' . "\n\n" . vim_git#run('diff --name-status ' . self.currentBranch . '..' . self.diffBranch)

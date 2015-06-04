@@ -1,9 +1,10 @@
 " Date Create: 2015-02-10 10:12:11
-" Last Change: 2015-02-19 10:12:48
+" Last Change: 2015-06-04 23:17:47
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
 let s:Buffer = vim_lib#sys#Buffer#
+let s:System = vim_lib#sys#System#
 let s:Content = vim_lib#sys#Content#.new()
 let s:BufferStack = vim_lib#view#BufferStack#
 
@@ -24,6 +25,8 @@ call s:screen.map('n', '<Enter>', 'checkout')
 call s:screen.map('n', 'u', 'checkoutHead')
 call s:screen.map('n', 'd', 'diff')
 call s:screen.map('n', 's', 'show')
+call s:screen.map('n', 'v', 'toogleType')
+call s:screen.map('n', 'f', 'filter')
 
 "" {{{
 " Делает заданный комит текущим.
@@ -58,6 +61,42 @@ function! s:screen.show() " {{{
   call self.stack.push(l:buf)
   call self.stack.active()
 endfunction " }}}
+"" {{{
+" Изменяет тип вывода лога.
+"" }}}
+function! s:screen.toogleType() " {{{
+  if g:vim_git#.logType == 'classic'
+    let g:vim_git#.logType = 'graph'
+  else
+    let g:vim_git#.logType = 'classic'
+  endif
+  call self.redraw()
+endfunction " }}}
+function! s:screen.filter() " {{{
+  call s:System.echo('Filters:', 'ModeMsg')
+  call s:System.echo('0. Author [' . g:vim_git#.logAuthor . ']')
+  call s:System.echo('1. Before [' . g:vim_git#.logBefore . ']')
+  call s:System.echo('2. After [' . g:vim_git#.logAfter . ']')
+  call s:System.echo('9. Clear filters')
+  let l:type = s:System.read('Select filter type: ')
+  if l:type != ''
+    if l:type == 0
+      let g:vim_git#.logAuthor = s:System.read('Set filter "author": ')
+      call self.active()
+    elseif l:type == 1
+      let g:vim_git#.logBefore = s:System.read('Set filter "before": ')
+      call self.active()
+    elseif l:type == 2
+      let g:vim_git#.logAfter = s:System.read('Set filter "after": ')
+      call self.active()
+    elseif l:type == 9
+      let g:vim_git#.logAuthor = ''
+      let g:vim_git#.logBefore = ''
+      let g:vim_git#.logAfter = ''
+      call self.active()
+    endif
+  endif
+endfunction " }}}
 
 call s:screen.map('n', '?', 'showHelp')
 " Подсказки. {{{
@@ -67,6 +106,8 @@ let s:screen.help = ['" Manual "',
                    \ '" u - checkout orig head',
                    \ '" d - show diff commit',
                    \ '" s - show commit info',
+                   \ '" v - toogle log type',
+                   \ '" f - set filters',
                    \ ''
                    \]
 " }}}

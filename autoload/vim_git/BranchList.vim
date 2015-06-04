@@ -1,5 +1,5 @@
 " Date Create: 2015-02-10 22:34:25
-" Last Change: 2015-02-19 14:51:31
+" Last Change: 2015-03-15 22:07:21
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -13,7 +13,15 @@ call s:screen.temp()
 call s:screen.option('filetype', 'git-branch')
 
 function! s:screen.render() " {{{
-  return '" Branch list (Press ? for help) "' . "\n\n" . '"" Local branch ""' . "\n\n" . vim_git#run('branch') . "\n" . '"" Remote branch ""' . "\n\n" . vim_git#run('branch -r')
+  return '" Branch list (Press ? for help) "' . 
+        \"\n\n" . 
+        \'" Local branch' . 
+        \"\n\n" . 
+        \vim_git#run('branch') . 
+        \"\n" . 
+        \'" Remote branch' . 
+        \"\n\n" . 
+        \vim_git#run('branch -r')
 endfunction " }}}
 
 call s:screen.map('n', '<Enter>', 'checkout')

@@ -1,2 +1,3 @@
-syntax match Comment /^".*/
+set syntax=git-base
+
 syntax match String /^\*.*/

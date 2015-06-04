@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-02-26 14:29:55
+" Last Change: 2015-06-04 23:13:24
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -334,7 +334,11 @@ endfunction " }}}
 "" }}}
 function! vim_git#classicLog() " {{{
   let l:size = (g:vim_git#.logSize == 0)? '' : '-' . g:vim_git#.logSize
-  return vim_git#run('log ' . l:size)
+  let l:filterAuthor = (g:vim_git#.logAuthor == '' )? '' : '--author="' . g:vim_git#.logAuthor . '"'
+  let l:filterAfter = (g:vim_git#.logAfter == '' )? '' : '--after="' . g:vim_git#.logAfter . '"'
+  let l:filterBefore = (g:vim_git#.logBefore == '' )? '' : '--before="' . g:vim_git#.logBefore . '"'
+
+  return vim_git#run('log ' . l:size . ' ' . l:filterAuthor . ' ' . l:filterAfter . ' ' . l:filterBefore)
 endfunction " }}}
 
 "" {{{
@@ -342,11 +346,23 @@ endfunction " }}}
 "" }}}
 function! vim_git#graphLog() " {{{
   let l:size = (g:vim_git#.logSize == 0)? '' : '-' . g:vim_git#.logSize
-  return vim_git#run('log ' . l:size . ' --graph --pretty="format:%h [%ar by %an] - %s "')
+  let l:filterAuthor = (g:vim_git#.logAuthor == '' )? '' : '--author="' . g:vim_git#.logAuthor . '"'
+  let l:filterAfter = (g:vim_git#.logAfter == '' )? '' : '--after="' . g:vim_git#.logAfter . '"'
+  let l:filterBefore = (g:vim_git#.logBefore == '' )? '' : '--before="' . g:vim_git#.logBefore . '"'
+
+  return vim_git#run('log ' . l:size . ' ' . l:filterAuthor . ' ' . l:filterAfter . ' ' . l:filterBefore . ' --graph --pretty="format:%h [%ar by %an] - %s "')
 endfunction " }}}
 " }}}
 
 " branch {{{
+"" {{{
+" Метод определяет текущую ветку.
+" @return string Имя текущей ветки.
+"" }}}
+function! vim_git#currentBranch() " {{{
+  return vim_git#run('rev-parse --abbrev-ref HEAD')[0 : -2]
+endfunction " }}}
+
 "" {{{
 " Метод создает новую ветку.
 " @param string name Имя создаваемой ветки.
