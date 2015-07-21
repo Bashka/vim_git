@@ -1,5 +1,5 @@
 " Date Create: 2015-01-09 13:19:18
-" Last Change: 2015-06-04 23:13:24
+" Last Change: 2015-07-21 18:27:09
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -408,7 +408,7 @@ endfunction " }}}
 " @throws ShellException Выбрасывается в случае ошибки при выполнении команды.
 "" }}}
 function! vim_git#renameBranch(name, newname) " {{{
-  call vim_git#run('branch -M ' . a:name . ' ' . l:newname)
+  call vim_git#run('branch -M ' . a:name . ' ' . a:newname)
 endfunction " }}}
 
 "" {{{
