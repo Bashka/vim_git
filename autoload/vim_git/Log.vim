@@ -1,5 +1,5 @@
 " Date Create: 2015-02-10 10:12:11
-" Last Change: 2015-06-04 23:17:47
+" Last Change: 2015-12-15 22:14:50
 " Author: Artur Sh. Mamedbekov (Artur-Mamedbekov@yandex.ru)
 " License: GNU GPL v3 (http://www.gnu.org/copyleft/gpl.html)
 
@@ -77,6 +77,7 @@ function! s:screen.filter() " {{{
   call s:System.echo('0. Author [' . g:vim_git#.logAuthor . ']')
   call s:System.echo('1. Before [' . g:vim_git#.logBefore . ']')
   call s:System.echo('2. After [' . g:vim_git#.logAfter . ']')
+  call s:System.echo('3. Size [' . g:vim_git#.logSize . ']')
   call s:System.echo('9. Clear filters')
   let l:type = s:System.read('Select filter type: ')
   if l:type != ''
@@ -89,10 +90,14 @@ function! s:screen.filter() " {{{
     elseif l:type == 2
       let g:vim_git#.logAfter = s:System.read('Set filter "after": ')
       call self.active()
+    elseif l:type == 3
+      let g:vim_git#.logSize = s:System.read('Set filter "size": ')
+      call self.active()
     elseif l:type == 9
       let g:vim_git#.logAuthor = ''
       let g:vim_git#.logBefore = ''
       let g:vim_git#.logAfter = ''
+      let g:vim_git#.logSize = 20
       call self.active()
     endif
   endif
